@@ -1,10 +1,13 @@
 from aiogram import Bot, executor, Dispatcher, types
 from decouple import config
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, ParseMode
 import logging
 import markups
+import random
 
 
 TOKEN = config("TOKEN")
+
 bot = Bot(TOKEN)
 dp = Dispatcher(bot=bot)
 
@@ -14,6 +17,13 @@ async def hello(message: types.Message):
 
 @dp.message_handler(commands=['quiz'])
 async def quiz(message: types.Message):
+    markup1 = InlineKeyboardMarkup()
+    button_call_1 = InlineKeyboardButton(
+        "NEXT",
+        callback_data="button_call_1"
+    )
+    markup1.add(button_call_1)
+
     question = "Сколько библиотек можно импорировать в один проект?"
     answers = ['Не более 5', 'Не более 10', 'Не более 20', 'Неограниченное количество']
     await bot.send_poll(message.chat.id,
@@ -22,21 +32,53 @@ async def quiz(message: types.Message):
                         is_anonymous=False,
                         type='quiz',
                         correct_option_id=3,
-                        reply_markup=markups.markup
+                        open_period=5,
+                        reply_markup=markup1
                         )
 
-@dp.message_handler(commands=['quiz2'])
-async def quiz2(message: types.Message):
+
+@dp.callback_query_handler(lambda func: func.data == "button_call_1")
+async def quiz1(call: types.CallbackQuery):
+    markup2 = InlineKeyboardMarkup()
+    button_call_2 = InlineKeyboardButton(
+        "NEXT",
+        callback_data="button_call_2"
+    )
+    markup2.add(button_call_2)
     question = "Где правильно создана переменная?"
     answers = ['int num = 2', 'var num = 2', 'num = float(2)', '$num = 2']
-    await bot.send_poll(message.chat.id,
+    await bot.send_poll(call.message.chat.id,
                         question=question,
                         options=answers,
                         is_anonymous=False,
                         type='quiz',
                         correct_option_id=2,
-                        reply_markup=markups.button_next
+                        open_period=5,
+                        reply_markup=markup2
                         )
+
+@dp.callback_query_handler(lambda func: func.data == "button_call_2")
+async def quiz3(call: types.CallbackQuery):
+    markup3 = InlineKeyboardMarkup()
+    button_call_2 = InlineKeyboardButton(
+        "NEXT",
+        callback_data="button_call_2"
+    )
+    markup3.add(button_call_2)
+
+    question = "Какого типа данных не существует в python?"
+    answers = ['int', 'str', 'elif', 'tuple']
+    await bot.send_poll(call.message.chat.id,
+                        question=question,
+                        options=answers,
+                        is_anonymous=False,
+                        type='quiz',
+                        correct_option_id=2,
+                        open_period=5,
+                        reply_markup=markup3
+                        )
+
+
 
 @dp.message_handler(commands=['mem'])
 async def mem(message: types.Message):
@@ -50,6 +92,13 @@ async def echo_message(message: types.Message):
         await message.answer(a ** 2)
     else:
         await message.answer(message.text)
+
+@dp.message_handler()
+async def game(message: types.Message):
+    emo = '🏀, 🎲, 🎯, 🎳, 🎰'.split()
+    e = random.choice(emo)
+    if message.text == 'game':
+        await bot.send_dice(message.from_user.id, emo=e)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
