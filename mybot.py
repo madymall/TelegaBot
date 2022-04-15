@@ -95,7 +95,7 @@ async def echo_message(message: types.Message):
 
 @dp.message_handler()
 async def game(message: types.Message):
-    emo = '🏀, 🎲, 🎯, 🎳, 🎰'.split()
+    emo = '🏀 🎲 🎯 🎳 🎰'.split()
     e = random.choice(emo)
     if message.text == 'game':
         await bot.send_dice(message.from_user.id, emo=e)

@@ -1,3 +1,4 @@
+../handlers/.env
 .env
 .idea
 venv
