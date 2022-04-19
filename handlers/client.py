@@ -2,6 +2,8 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram import types, Dispatcher
 from config import bot, dp, ADMIN
 
+from database import bot_db
+
 # @dp.message_handler(commands=['start'])
 async def hello(message: types.Message):
     await bot.send_message(message.chat.id, f"Привет, {message.from_user.full_name}!")
@@ -73,9 +75,13 @@ async def ban(message: types.Message):
     else:
         await message.answer("Это работает только в группах!")
 
+async def show_random_dish(message: types.Message):
+    await bot_db.sql_command_random(message)
+
 def register_hendlers_client(dp: Dispatcher):
     dp.register_message_handler(mem, commands=["mem"])
     dp.register_message_handler(hello, commands=["start"])
     dp.register_message_handler(quiz, commands=["quiz"])
     dp.register_message_handler(quiz, commands=["quiz1"])
     dp.register_message_handler(ban, commands=["ban"], commands_prefix="!/")
+    dp.register_message_handler(show_random_dish, commands=["random"])
