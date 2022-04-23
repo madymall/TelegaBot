@@ -17,7 +17,7 @@ async def random_dish():
                                  f"Price: {result[r_d][3]}")
 # print(random_dish())
 async def scheduler():
-    aioschedule.every().day.at('23:05').do(random_dish)
+    aioschedule.every().day.at('20:00').do(random_dish)
     while True:
         await aioschedule.run_pending()
         await asyncio.sleep(1)
