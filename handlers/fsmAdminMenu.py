@@ -3,7 +3,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from .keyboards import cancel_markup
+from .keyboards import *
 from config import bot, ADMIN
 from database import bot_db
 
@@ -14,13 +14,17 @@ class FSMAdmin(StatesGroup):
     description = State()
     price = State()
 
+async def start(message: types.Message):
+    await bot.send_message(message.chat.id, 'Напишите "Блюдо дня", чтобы получить рекомендацию.')
 # start fsm
 async def fsm_start(message: types.Message):
     if message.chat.type == 'private':
         await FSMAdmin.photo.set()
+
         await bot.send_message(message.chat.id,
                                f"Приветствую, {message.from_user.full_name}! Отправьте фото блюда.",
-                               reply_markup=cancel_markup)
+                            reply_markup=cancel_markup)
+
     else:
         await message.answer("Пишите в личные сообщения, пожалуйста.")
 
@@ -65,11 +69,12 @@ async def cancel_reg(message: types.Message, state: FSMContext):
         await state.finish()
         await message.reply("ОК")
 
+
 async def delete_data(message: types.Message):
     if message.from_user.id == ADMIN:
         results = await bot_db.sql_command_all(message)
         for result in results:
-            await bot.send_photo(message.from_user.id, result[0],
+            await bot.send_photo(message.from_user.id, photo=result[0],
                          caption=f"Name: {result[1]}\n"
                                  f"Description: {result[2]}\n"
                                  f"Price: {result[1]}",
@@ -90,6 +95,7 @@ def register_hendler_fsmAdminGetUser(dp: Dispatcher):
     dp.register_message_handler(cancel_reg, state="*", commands="cancel")
     dp.register_message_handler(cancel_reg, Text(equals='cancel', ignore_case=True), state="*")
 
+    dp.register_message_handler(start, commands=["start"])
     dp.register_message_handler(fsm_start, commands=["register"])
     dp.register_message_handler(load_photo, state=FSMAdmin.photo, content_types=["photo"])
     dp.register_message_handler(load_name, state=FSMAdmin.name)

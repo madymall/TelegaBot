@@ -7,3 +7,4 @@ pychache/
 *$py.class
 *.so
 media
+bot.sqlite3

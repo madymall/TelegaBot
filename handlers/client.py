@@ -78,6 +78,8 @@ async def ban(message: types.Message):
 async def show_random_dish(message: types.Message):
     await bot_db.sql_command_random(message)
 
+
+
 def register_hendlers_client(dp: Dispatcher):
     dp.register_message_handler(mem, commands=["mem"])
     dp.register_message_handler(hello, commands=["start"])
