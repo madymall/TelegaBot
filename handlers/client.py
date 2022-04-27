@@ -1,6 +1,8 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram import types, Dispatcher
 from config import bot, dp, ADMIN
+from parser import news
+
 
 from database import bot_db
 
@@ -78,6 +80,11 @@ async def ban(message: types.Message):
 async def show_random_dish(message: types.Message):
     await bot_db.sql_command_random(message)
 
+async def parser_news(message:types.Message):
+    data = news.parser()
+    for item in data:
+        await bot.send_message(message.chat.id,
+                               f'{item["date"].replace("T", " ")}\n{item["tittle"]}\n{item["desc"]}\n{item["link"]}')
 
 
 def register_hendlers_client(dp: Dispatcher):
@@ -87,3 +94,4 @@ def register_hendlers_client(dp: Dispatcher):
     dp.register_message_handler(quiz, commands=["quiz1"])
     dp.register_message_handler(ban, commands=["ban"], commands_prefix="!/")
     dp.register_message_handler(show_random_dish, commands=["random"])
+    dp.register_message_handler(parser_news, commands=['news'])
